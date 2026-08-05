@@ -151,6 +151,8 @@
   .btn-ghost{ background:var(--paper-alt); color:var(--ink); border:1px solid var(--line); }
   .btn-ghost:active{ background:var(--line); }
   .btn-mark{ background:var(--navy); color:#EDE7D6; }
+  .btn-danger{ background:#fff; color:var(--due); border:1.5px solid var(--due); }
+  .btn-danger:active{ background:#F7E3DB; }
 
   .empty{
     text-align:center; color:var(--muted); font-size:13.5px; padding:30px 20px;
@@ -359,7 +361,7 @@ function defaultState(){
     ui: { tab:'dashboard', bannerDismissed:false },
     settings: { dueDay: 10, lateFeeAmount: 100 },
     templates: {
-      reminder: "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
+      reminder: "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
       receipt: "Hi {name} 🙏\nRent received for Room {room} — {month}.\n\nAmount Paid: ₹{paid}\nTotal Due was: ₹{total}\nBalance carried forward: ₹{balanceNext}\n\nThank you for your payment! 🙏",
       late: "Hi {name} 🙏\nThis is regarding Room {room} — {month} rent.\n\n*Total Due (incl. late charge): ₹{due}*\n(Rent was due by the {dueDay}th; a late charge of ₹{lateFeeAmount} has been added.)\n\nPlease clear this at the earliest to avoid further charges. Thank you."
     }
@@ -401,9 +403,32 @@ function migratePhoneBook(){
   if(changed) saveState();
 }
 
+const Store = {
+  async get(key){
+    try{
+      const v = localStorage.getItem(key);
+      if(v) return { value: v };
+    }catch(e){ console.warn('localStorage get unavailable', e); }
+    try{
+      const r = await window.storage.get(key);
+      if(r && r.value) return r;
+    }catch(e){ /* not available in this context, ignore */ }
+    return null;
+  },
+  async set(key, value){
+    let localOk = false;
+    try{ localStorage.setItem(key, value); localOk = true; }
+    catch(e){ console.warn('localStorage set failed', e); }
+    try{ await window.storage.set(key, value); }
+    catch(e){ /* window.storage may not exist outside Claude's app frame; ignore */ }
+    if(!localOk) throw new Error('local save failed');
+    return true;
+  }
+};
+
 async function loadState(){
   try{
-    const r = await window.storage.get(STORAGE_KEY);
+    const r = await Store.get(STORAGE_KEY);
     state = r && r.value ? JSON.parse(r.value) : defaultState();
   }catch(e){
     state = defaultState();
@@ -414,7 +439,10 @@ async function loadState(){
     state.templates.late = "Hi {name} 🙏\nThis is regarding Room {room} — {month} rent.\n\n*Total Due (incl. late charge): ₹{due}*\n(Rent was due by the {dueDay}th; a late charge of ₹{lateFeeAmount} has been added.)\n\nPlease clear this at the earliest to avoid further charges. Thank you.";
   }
   if(state.templates && state.templates.reminder === "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nPlease pay by the {dueDay}th to avoid a late charge of ₹{lateFeeAmount}. Kindly pay at your earliest convenience. Thank you!"){
-    state.templates.reminder = "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!";
+    state.templates.reminder = "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!";
+  }
+  if(state.templates && state.templates.reminder === "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!"){
+    state.templates.reminder = "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!";
   }
   if(!state.months[state.activeMonth]) {
     const keys = Object.keys(state.months).sort();
@@ -425,12 +453,29 @@ async function loadState(){
 }
 
 let saveTimer=null;
+let saveWarned = false;
+async function attemptSave(retries){
+  try{
+    await Store.set(STORAGE_KEY, JSON.stringify(state));
+    saveWarned = false;
+    return true;
+  }catch(e){
+    console.error('save failed', e);
+    if(retries > 0){
+      await new Promise(r=>setTimeout(r, 700));
+      return attemptSave(retries - 1);
+    }
+    if(!saveWarned){
+      saveWarned = true;
+      toast('⚠️ Could not save — check connection & reopen the app');
+    }
+    return false;
+  }
+}
+
 function saveState(){
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async ()=>{
-    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state)); }
-    catch(e){ console.error('save failed', e); }
-  }, 300);
+  saveTimer = setTimeout(()=>{ attemptSave(2); }, 300);
 }
 
 function tenantById(id){ return state.tenants.find(t=>t.id===id); }
@@ -488,15 +533,33 @@ function toast(msg){
   setTimeout(()=>el.classList.remove('show'), 1800);
 }
 
+function showConfirm(message, onConfirm){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(27,35,64,0.5);z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:20px;max-width:320px;width:100%;font-family:'Inter',sans-serif;">
+      <p style="margin:0 0 18px;font-size:14px;color:var(--ink);line-height:1.55;">${message}</p>
+      <div style="display:flex;gap:8px;">
+        <button id="confirmCancelBtn" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--paper-alt);font-weight:600;font-size:13.5px;color:var(--ink);">Cancel</button>
+        <button id="confirmOkBtn" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--due);color:#fff;font-weight:600;font-size:13.5px;">Confirm</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#confirmCancelBtn').onclick = ()=> overlay.remove();
+  overlay.querySelector('#confirmOkBtn').onclick = ()=>{ overlay.remove(); onConfirm(); };
+}
+
 function fillTemplate(tpl, tenant, rec, computed){
   const map = {
     name: tenant.name,
     room: tenant.room,
     month: monthLabel(state.activeMonth),
     rent: tenant.basicRent,
-    electricity: computed.electricity,
+    electricity: computed.electricity + (rec.water||0), // water folded in — kept hidden from tenant
     sweeper: rec.sweeper||0,
-    water: rec.water||0,
+    water: 0, // never exposed to tenant messages
     balancePrev: rec.balancePrev||0,
     total: computed.total,
     paid: rec.rentPaid||0,
@@ -573,6 +636,18 @@ function markPaid(tenantId){
   rec.rentPaid = c.total + c.lateFeeApplied;
   saveState();
   render();
+}
+
+function markUnpaid(tenantId){
+  const t = tenantById(tenantId);
+  const rec = state.months[state.activeMonth].records[tenantId];
+  if((rec.rentPaid||0) === 0){ toast(t.name + ' is already unpaid'); return; }
+  showConfirm('Mark <b>' + t.name + '</b> (' + t.room + ') as unpaid? This resets Rent Paid to ₹0 for ' + monthLabel(state.activeMonth) + '.', ()=>{
+    rec.rentPaid = 0;
+    saveState();
+    render();
+    toast(t.name + ' marked unpaid');
+  });
 }
 
 /* ---------- Rendering ---------- */
@@ -715,6 +790,9 @@ function renderCollect(){
       </div>
       <div class="card-actions">
         <button class="btn btn-ghost" data-mark="${t.id}">Mark Paid</button>
+        <button class="btn btn-danger" data-unmark="${t.id}">Mark Unpaid</button>
+      </div>
+      <div class="card-actions">
         <button class="btn btn-wa" data-wa-r="${t.id}" style="${c.isLate?'background:var(--due);':''}">${c.isLate?'Late Fee Notice':'Remind'}</button>
         <button class="btn btn-wa" data-wa-p="${t.id}" style="background:var(--wa-dark);">Receipt</button>
       </div>
@@ -723,6 +801,7 @@ function renderCollect(){
       inp.addEventListener('change', ()=> updateField(t.id, inp.dataset.f, inp.value));
     });
     card.querySelector('[data-mark]').onclick = ()=>markPaid(t.id);
+    card.querySelector('[data-unmark]').onclick = ()=>markUnpaid(t.id);
     card.querySelector('[data-wa-r]').onclick = ()=>sendWhatsApp(t.id, c.isLate ? 'late' : 'reminder');
     card.querySelector('[data-wa-p]').onclick = ()=>sendWhatsApp(t.id,'receipt');
     wrap.appendChild(card);
@@ -770,11 +849,11 @@ function renderTenants(){
       saveState();
     });
     row.querySelector('[data-remove]').onclick = ()=>{
-      if(confirm('Remove ' + t.name + ' from tenant list? This does not delete past month records.')){
+      showConfirm('Remove <b>' + t.name + '</b> from tenant list? This does not delete past month records.', ()=>{
         state.tenants = state.tenants.filter(x=>x.id!==t.id);
         saveState();
         render();
-      }
+      });
     };
     wrap.appendChild(row);
   });
@@ -827,7 +906,7 @@ function renderMessage(){
       <p class="hint">${hint}</p>
       <textarea id="tpl-${kind}">${tpl}</textarea>
       <div class="placeholders">
-        ${['name','room','month','rent','electricity','sweeper','water','balancePrev','total','paid','due','balanceNext','dueDay','lateFeeAmount'].map(p=>`<span class="chip" data-ins="{${p}}">{${p}}</span>`).join('')}
+        ${['name','room','month','rent','electricity','sweeper','balancePrev','total','paid','due','balanceNext','dueDay','lateFeeAmount'].map(p=>`<span class="chip" data-ins="{${p}}">{${p}}</span>`).join('')}
       </div>
       <div class="preview-label">Preview</div>
       <div class="preview" id="prev-${kind}"></div>
@@ -859,7 +938,7 @@ function renderMessage(){
     return div;
   }
 
-  wrap.appendChild(block('reminder','Rent Reminder','Sent before the due date, or any time rent is still owed. Tap the chips below to insert a value into your message.'));
+  wrap.appendChild(block('reminder','Rent Reminder','Sent before the due date, or any time rent is still owed. Tap the chips below to insert a value into your message. Note: water charges are folded into {electricity} and never shown separately to tenants.'));
   wrap.appendChild(block('late','Late Charge Notice','Appears as the button on a tenant\'s card once they are past the due day and still owe money — includes the late charge.'));
   wrap.appendChild(block('receipt','Payment Receipt','Sent any time to confirm what was paid, e.g. after you tap "Mark Paid".'));
   return wrap;
