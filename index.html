@@ -361,8 +361,8 @@ function defaultState(){
     ui: { tab:'dashboard', bannerDismissed:false },
     settings: { dueDay: 10, lateFeeAmount: 100 },
     templates: {
-      reminder: "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
-      receipt: "Hi {name} 🙏\nRent received for Room {room} — {month}.\n\nAmount Paid: ₹{paid}\nTotal Due was: ₹{total}\nBalance carried forward: ₹{balanceNext}\n\nThank you for your payment! 🙏",
+      reminder: "Hi {name} Ji 🙏\nRent reminder for Room {room} — *{month}*.\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
+      receipt: "Hi {name} Ji\nRent received for Room {room} — *{month}*.\nAmount Paid: ₹{paid}\nTotal Due was: ₹{total}\nBalance carried forward: ₹{balanceNext}\nThank you for your payment!",
       late: "Hi {name} 🙏\nThis is regarding Room {room} — {month} rent.\n\n*Total Due (incl. late charge): ₹{due}*\n(Rent was due by the {dueDay}th; a late charge of ₹{lateFeeAmount} has been added.)\n\nPlease clear this at the earliest to avoid further charges. Thank you."
     }
   };
