@@ -2,433 +2,588 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>Kiraya Book</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kiraya Book">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#7a2323">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pankaj S/o Mahender Apartments</title>
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pankaj Apartments">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#F6F1E4;
-    --paper-dark:#EDE4CE;
-    --ink:#2B2621;
-    --ink-soft:#6b6255;
-    --maroon:#7a2323;
-    --maroon-dark:#5c1a1a;
-    --gold:#B08A3E;
-    --green:#2f6b4f;
-    --red:#a4302b;
-    --line:#d8cdb2;
-    --white:#fffdf8;
+    --navy:#1B2340;
+    --navy-light:#2A3459;
+    --paper:#FAF7EF;
+    --paper-alt:#F0EADA;
+    --line:#DCD3BC;
+    --brass:#AD7C2B;
+    --brass-light:#D9A94C;
+    --ink:#241F14;
+    --muted:#7A7362;
+    --wa:#1F9E56;
+    --wa-dark:#177A43;
+    --due:#A8432B;
+    --good:#2F6E49;
+    --card:#FFFFFF;
+    --radius:14px;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    padding-bottom:calc(72px + env(safe-area-inset-bottom));
-    padding-top:env(safe-area-inset-top);
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(74px + env(safe-area-inset-bottom));
     min-height:100vh;
-    background-image:
-      linear-gradient(var(--paper-dark) 1px, transparent 1px);
-    background-size: 100% 34px;
-    background-attachment:local;
   }
-  .mono{font-family:"SF Mono",ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;}
-  header.app-header{
-    background:var(--maroon);
-    color:var(--white);
-    padding:16px 18px 14px;
-    position:sticky; top:0; z-index:20;
-    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+  .mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+  .app-header{
+    background:var(--navy);
+    color:#EDE7D6;
+    padding:calc(18px + env(safe-area-inset-top)) 18px 16px;
+    position:relative;
+    overflow:hidden;
   }
-  header.app-header .title-row{display:flex; align-items:center; justify-content:space-between;}
-  header.app-header h1{font-size:19px; margin:0; letter-spacing:0.3px; font-weight:700;}
-  header.app-header .sub{font-size:12px; opacity:0.8; margin-top:2px;}
-  .month-nav{display:flex; align-items:center; gap:10px; margin-top:10px;}
-  .month-nav button{
-    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25); color:var(--white);
-    width:30px; height:30px; border-radius:8px; font-size:16px; line-height:1;
+  .app-header::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:14px;
+    background-image:repeating-linear-gradient(to bottom, transparent 0 5px, rgba(237,231,214,0.08) 5px 6px);
   }
-  .month-nav .month-label{flex:1; text-align:center; font-weight:600; font-size:14.5px;}
-  #app-content{padding:14px 14px 6px;}
+  .brand{
+    display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  }
+  .brand h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:24px; margin:0;
+    letter-spacing:0.2px;
+  }
+  .brand h1 span{ color:var(--brass-light); }
+  .brand .tag{ font-size:11px; color:#B9B2A0; text-transform:uppercase; letter-spacing:1.5px; margin-top:2px;}
+  .month-switch{
+    margin-top:16px; display:flex; align-items:center; justify-content:space-between;
+    background:var(--navy-light); border-radius:12px; padding:8px 6px;
+  }
+  .month-switch button{
+    background:none; border:none; color:#EDE7D6; font-size:20px; padding:6px 14px; cursor:pointer; border-radius:8px;
+  }
+  .month-switch button:active{ background:rgba(255,255,255,0.08); }
+  .month-label{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; text-align:center; flex:1; }
+  .month-sub{ font-size:10.5px; color:var(--brass-light); text-align:center; letter-spacing:0.5px; margin-top:1px;}
+
+  #app-content{ padding:16px 16px 8px; max-width:640px; margin:0 auto; }
 
   .install-banner{
-    display:flex; align-items:center; gap:10px;
-    background:var(--gold); color:#332600; border-radius:12px;
-    padding:10px 12px; margin-bottom:14px; font-size:13px; line-height:1.35;
+    background:var(--paper-alt); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; font-size:13px; color:var(--muted); margin-bottom:14px;
+    display:flex; gap:10px; align-items:flex-start; line-height:1.45;
   }
-  .install-banner button{background:#332600; color:var(--gold); border:none; border-radius:7px; padding:6px 10px; font-size:12px; font-weight:600;}
-
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
-  .stat-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:14px; box-shadow:0 1px 0 rgba(0,0,0,0.03);}
-  .stat-card .label{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;}
-  .stat-card .value{font-size:22px; font-weight:700;}
-  .stat-card.paid .value{color:var(--green);}
-  .stat-card.due .value{color:var(--red);}
-
-  .section-title{display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; margin:18px 0 10px; color:var(--maroon-dark);}
-  .section-title .count{background:var(--maroon); color:#fff; font-size:11px; padding:1px 8px; border-radius:20px; font-weight:600;}
-
-  .pending-card{
-    background:var(--white); border:1px solid var(--line); border-left:4px solid var(--red);
-    border-radius:12px; padding:12px 14px; margin-bottom:9px;
-    display:flex; justify-content:space-between; align-items:center;
+  .install-banner b{ color:var(--ink); }
+  .install-banner button{
+    border:none; background:transparent; color:var(--brass); font-weight:600; font-size:12px;
+    margin-left:auto; padding:2px 4px; cursor:pointer; white-space:nowrap;
   }
-  .pending-card.late{border-left-color:#8a1f1f; background:#fff6f4;}
-  .pending-card .name{font-weight:600; font-size:14.5px;}
-  .pending-card .room{color:var(--ink-soft); font-size:12px;}
-  .pending-card .amt{font-weight:700; color:var(--red); font-size:15px;}
-  .pending-card .late-tag{font-size:10px; background:#8a1f1f; color:#fff; padding:1px 6px; border-radius:8px; margin-left:6px; vertical-align:middle;}
 
-  .empty-state{text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13.5px;}
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .stat-card{
+    background:var(--card); border-radius:var(--radius); padding:14px 14px 12px;
+    border:1px solid var(--line);
+  }
+  .stat-card .label{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); }
+  .stat-card .value{ font-family:'Fraunces',serif; font-size:22px; font-weight:600; margin-top:4px; }
+  .stat-card.due .value{ color:var(--due); }
+  .stat-card.paid .value{ color:var(--good); }
+
+  .section-title{
+    font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:18px 0 10px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .section-title .count{ font-size:12px; color:var(--muted); font-weight:400; font-family:'Inter',sans-serif;}
 
   .tenant-card{
-    background:var(--white); border:1px solid var(--line); border-radius:16px; padding:14px 15px; margin-bottom:12px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px; margin-bottom:12px;
   }
-  .tenant-card .head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;}
-  .tenant-card .head .name{font-weight:700; font-size:15.5px;}
-  .tenant-card .head .room{font-size:12px; color:var(--ink-soft);}
-  .status-pill{font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600;}
-  .status-pill.paid{background:#e2f2e8; color:var(--green);}
-  .status-pill.due{background:#f8e6e3; color:var(--red);}
-
-  .field-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;}
-  .field{display:flex; flex-direction:column; gap:3px;}
-  .field label{font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px;}
-  .field input, .field select{
-    border:1px solid var(--line); border-radius:9px; padding:8px 9px; font-size:14.5px; background:var(--paper);
-    color:var(--ink); font-family:inherit;
+  .tenant-card .row1{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .tenant-card .who{ display:flex; flex-direction:column; }
+  .tenant-card .room{ font-size:11px; letter-spacing:0.5px; color:var(--brass); font-weight:600; text-transform:uppercase; }
+  .tenant-card .name{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; margin-top:1px; }
+  .status-pill{
+    font-size:10.5px; padding:4px 9px; border-radius:99px; font-weight:600; letter-spacing:0.3px;
+    white-space:nowrap;
   }
-  .field input:focus, .field select:focus{outline:2px solid var(--gold); outline-offset:1px;}
+  .status-pill.due{ background:#F7E3DB; color:var(--due); }
+  .status-pill.paid{ background:#DEEEE3; color:var(--good); }
 
-  .calc-strip{
-    background:var(--paper-dark); border-radius:10px; padding:9px 12px; margin:9px 0; font-size:12.5px;
-    display:grid; grid-template-columns:1fr 1fr; row-gap:4px;
+  .grid-inputs{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .field{ display:flex; flex-direction:column; gap:3px; }
+  .field label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
+  .field input{
+    border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-size:14px;
+    background:var(--paper); font-family:'IBM Plex Mono',monospace; color:var(--ink);
+    width:100%;
   }
-  .calc-strip .lbl{color:var(--ink-soft);}
-  .calc-strip .v{text-align:right; font-weight:600;}
-  .calc-strip .total-row{grid-column:1/-1; display:flex; justify-content:space-between; border-top:1px dashed var(--line); margin-top:5px; padding-top:6px; font-size:14px;}
-  .calc-strip .total-row .lbl{font-weight:700; color:var(--ink);}
-  .calc-strip .total-row .v{font-weight:800; color:var(--maroon-dark);}
-  .calc-strip .due-row{grid-column:1/-1; display:flex; justify-content:space-between; font-size:14px;}
-  .calc-strip .due-row .v{font-weight:800;}
+  .field input:focus{ outline:2px solid var(--brass-light); outline-offset:0; background:#fff;}
 
-  .btn-row{display:flex; gap:8px; margin-top:10px;}
-  .btn{flex:1; padding:10px; border-radius:10px; border:none; font-weight:700; font-size:13.5px;}
-  .btn-paid{background:var(--green); color:#fff;}
-  .btn-unpaid{background:#fff; color:var(--red); border:1.5px solid var(--red);}
-  .btn-wa{background:#25D366; color:#fff;}
-  .btn-secondary{background:var(--paper-dark); color:var(--ink);}
+  .breakdown{
+    margin-top:12px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size:12.5px; color:var(--muted); display:flex; flex-wrap:wrap; gap:6px 14px;
+  }
+  .breakdown b{ color:var(--ink); }
 
-  .tenant-row{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:13px 14px; margin-bottom:10px;}
-  .toprow{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-  .toggle{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft);}
-  .remove-x{background:none; border:none; color:var(--red); font-size:12px; font-weight:600;}
-  .grid-inputs{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .totals-row{
+    display:flex; justify-content:space-between; align-items:baseline; margin-top:10px;
+    padding-top:10px; border-top:1px solid var(--line);
+  }
+  .totals-row .tlabel{ font-size:12px; color:var(--muted); }
+  .totals-row .tval{ font-family:'Fraunces',serif; font-size:20px; font-weight:700; }
+  .totals-row .tval.due{ color:var(--due); }
+  .totals-row .tval.paid{ color:var(--good); }
 
+  .card-actions{ display:flex; gap:8px; margin-top:12px; }
+  .btn{
+    flex:1; border:none; border-radius:10px; padding:10px 8px; font-size:13px; font-weight:600;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .btn-wa{ background:var(--wa); color:#fff; }
+  .btn-wa:active{ background:var(--wa-dark); }
+  .btn-ghost{ background:var(--paper-alt); color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost:active{ background:var(--line); }
+  .btn-mark{ background:var(--navy); color:#EDE7D6; }
+
+  .empty{
+    text-align:center; color:var(--muted); font-size:13.5px; padding:30px 20px;
+    background:var(--card); border-radius:var(--radius); border:1px dashed var(--line);
+  }
+
+  /* Tenants tab */
+  .tenant-row{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px;
+    margin-bottom:10px;
+  }
+  .tenant-row .grid-inputs{ grid-template-columns:1fr 1fr; }
+  .tenant-row .toprow{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .toggle{
+    display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted); cursor:pointer;
+  }
+  .toggle input{ accent-color:var(--brass); }
+  .remove-x{
+    background:none; border:none; color:var(--due); font-size:12px; cursor:pointer; font-weight:600;
+  }
   .add-btn{
-    width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--maroon); background:none;
-    color:var(--maroon); font-weight:700; font-size:14px; margin-top:6px;
+    width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--brass);
+    background:none; color:var(--brass); font-weight:600; font-size:14px; cursor:pointer; margin-top:4px;
   }
 
-  .msg-block{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px;}
-  .msg-block h3{margin:0 0 3px; font-size:14.5px; color:var(--maroon-dark);}
-  .msg-block .hint{font-size:12px; color:var(--ink-soft); margin:0 0 8px;}
-  .msg-block textarea{width:100%; min-height:110px; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:13.5px; font-family:inherit; background:var(--paper); resize:vertical;}
-  .placeholders{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;}
-  .chip{background:var(--paper-dark); border:1px solid var(--line); border-radius:20px; padding:4px 10px; font-size:11.5px; color:var(--ink-soft);}
-  .preview-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin-top:6px;}
-  .preview{white-space:pre-wrap; background:var(--paper-dark); border-radius:10px; padding:10px; font-size:13px; margin-top:4px; line-height:1.5;}
+  /* Message tab */
+  .msg-block{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-bottom:16px; }
+  .msg-block h3{ font-family:'Fraunces',serif; font-size:15.5px; margin:0 0 4px; }
+  .msg-block p.hint{ font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.5;}
+  .msg-block textarea{
+    width:100%; min-height:150px; border:1px solid var(--line); border-radius:10px; padding:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; resize:vertical; background:var(--paper); color:var(--ink);
+  }
+  .placeholders{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip{
+    font-size:11px; background:var(--paper-alt); border:1px solid var(--line); color:var(--brass);
+    padding:4px 8px; border-radius:99px; font-family:'IBM Plex Mono',monospace; cursor:pointer;
+  }
+  .preview{
+    margin-top:12px; background:var(--paper-alt); border-radius:10px; padding:10px 12px;
+    font-size:12.5px; white-space:pre-wrap; color:var(--ink); line-height:1.5; border:1px solid var(--line);
+  }
+  .preview-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); margin-bottom:6px;}
 
-  .settings-block{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px;}
-  .settings-block h3{margin:0 0 8px; font-size:14.5px; color:var(--maroon-dark);}
-
+  /* Bottom nav */
   .tabbar{
-    position:fixed; bottom:0; left:0; right:0; background:var(--maroon); z-index:30;
-    display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom));
-    box-shadow:0 -2px 10px rgba(0,0,0,0.15);
+    position:fixed; left:0; right:0; bottom:0; background:var(--navy);
+    display:flex; padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    border-top:1px solid rgba(255,255,255,0.06);
+    z-index:20;
   }
   .tabbar button{
-    flex:1; background:none; border:none; color:rgba(255,255,255,0.62); padding:8px 2px;
+    flex:1; background:none; border:none; color:#9C96A6; padding:6px 2px; cursor:pointer;
     display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600;
+    letter-spacing:0.2px;
   }
-  .tabbar button .ic{font-size:19px;}
-  .tabbar button.active{color:#fff;}
+  .tabbar button.active{ color:var(--brass-light); }
+  .tabbar svg{ width:20px; height:20px; }
+
+  .month-summary-bar{
+    display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted);
+    background:var(--paper-alt); border-radius:10px; padding:8px 12px; margin-bottom:14px;
+  }
+  .month-summary-bar b{ color:var(--ink); }
+
+  .new-month-btn{
+    width:100%; padding:13px; border-radius:12px; border:none; background:var(--brass);
+    color:#fff; font-weight:600; font-size:14px; cursor:pointer; margin-top:6px; margin-bottom:6px;
+  }
 
   .toast{
-    position:fixed; bottom:calc(84px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:#2B2621; color:#fff; padding:10px 18px; border-radius:24px; font-size:13px; z-index:100;
-    opacity:0; pointer-events:none; transition:opacity 0.25s;
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+    background:var(--navy); color:#EDE7D6; padding:10px 16px; border-radius:99px; font-size:12.5px;
+    z-index:30; opacity:0; pointer-events:none; transition:opacity .25s ease;
   }
-  .toast.show{opacity:1;}
-
-  .modal-overlay{
-    position:fixed; inset:0; background:rgba(20,15,10,0.5); z-index:200;
-    display:flex; align-items:center; justify-content:center; padding:24px;
-    opacity:0; pointer-events:none; transition:opacity 0.2s;
-  }
-  .modal-overlay.show{opacity:1; pointer-events:auto;}
-  .modal-box{background:var(--white); border-radius:16px; padding:20px; max-width:340px; width:100%;}
-  .modal-box .m-title{font-weight:700; font-size:15.5px; margin-bottom:6px;}
-  .modal-box .m-body{font-size:13.5px; color:var(--ink-soft); line-height:1.4; margin-bottom:16px;}
-  .modal-box .m-btns{display:flex; gap:8px;}
-  .modal-box .m-btns button{flex:1; padding:10px; border-radius:10px; border:none; font-weight:700; font-size:13.5px;}
-  .modal-box .m-cancel{background:var(--paper-dark); color:var(--ink);}
-  .modal-box .m-confirm{background:var(--red); color:#fff;}
+  .toast.show{ opacity:1; }
 </style>
 </head>
 <body>
-<header class="app-header">
-  <div class="title-row">
+
+<div class="app-header">
+  <div class="brand">
     <div>
-      <h1>Kiraya Book</h1>
-      <div class="sub">Pankaj S/o Mahender Apartments</div>
+      <h1>Pankaj <span>Apartments</span></h1>
+      <div class="tag">S/o Mahender — Rent Ledger &amp; WhatsApp</div>
     </div>
   </div>
-  <div class="month-nav">
-    <button id="prevMonth">‹</button>
-    <div class="month-label" id="monthLabel"></div>
-    <button id="nextMonth">›</button>
-  </div>
-</header>
-
-<div id="app-content"></div>
-
-<nav class="tabbar">
-  <button data-tab="dashboard"><span class="ic">📊</span>Dashboard</button>
-  <button data-tab="collect"><span class="ic">💰</span>Collect</button>
-  <button data-tab="tenants"><span class="ic">🏠</span>Tenants</button>
-  <button data-tab="message"><span class="ic">💬</span>Message</button>
-</nav>
-
-<div class="toast" id="toast"></div>
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-box">
-    <div class="m-title" id="modalTitle"></div>
-    <div class="m-body" id="modalBody"></div>
-    <div class="m-btns">
-      <button class="m-cancel" id="modalCancel">Cancel</button>
-      <button class="m-confirm" id="modalConfirm">Confirm</button>
+  <div class="month-switch">
+    <button id="prevMonth" aria-label="Previous month">&#8249;</button>
+    <div>
+      <div class="month-label" id="monthLabel">—</div>
+      <div class="month-sub" id="monthSub"></div>
     </div>
+    <button id="nextMonth" aria-label="Next month">&#8250;</button>
   </div>
 </div>
 
+<div id="app-content"></div>
+
+<div class="tabbar">
+  <button data-tab="dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    Dashboard
+  </button>
+  <button data-tab="collect">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>
+    Collect
+  </button>
+  <button data-tab="tenants">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M17 8a3 3 0 110 6M22 20c0-2.6-2-4.7-4.5-5.5"/></svg>
+    Tenants
+  </button>
+  <button data-tab="message">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 8.5 8.5 0 01-4-1L3 20l1.2-5a8.4 8.4 0 01-1.2-4.5A8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>
+    Message
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-/* ---------- Seed data (from Aug 2026 sheet) ---------- */
-const SEED_TENANTS = [
-  {room:'B-001', name:'Rakesh',        basicRent:6200, lastReading:8144,  factor:8, sweeper:130, water:40,  balancePrev:68},
-  {room:'B-002', name:'Jai Narayan',   basicRent:6000, lastReading:6309,  factor:8, sweeper:130, water:80,  balancePrev:232},
-  {room:'B-003', name:'Budiya',        basicRent:6200, lastReading:1110,  factor:8, sweeper:130, water:50,  balancePrev:4},
-  {room:'B-101', name:'Dinesh',        basicRent:9000, lastReading:5976,  factor:8, sweeper:130, water:40,  balancePrev:4},
-  {room:'B-102', name:'Praveen',       basicRent:6000, lastReading:1270,  factor:8, sweeper:130, water:40,  balancePrev:250},
-  {room:'B-103', name:'Mantu',         basicRent:6200, lastReading:4744,  factor:8, sweeper:130, water:50,  balancePrev:26},
-  {room:'B-201', name:'Vishnu',        basicRent:9000, lastReading:814,   factor:8, sweeper:130, water:40,  balancePrev:40},
-  {room:'B-202', name:'Jyoti',         basicRent:6100, lastReading:15222, factor:8, sweeper:130, water:60,  balancePrev:64},
-  {room:'B-203', name:'Meera',         basicRent:6200, lastReading:215,   factor:8, sweeper:130, water:50,  balancePrev:50},
-  {room:'B-301', name:'Keshar',        basicRent:9500, lastReading:4490,  factor:8, sweeper:130, water:50,  balancePrev:2350},
-  {room:'B-302', name:'Ajay Sharma',   basicRent:6000, lastReading:1870,  factor:8, sweeper:130, water:50,  balancePrev:0},
-  {room:'B-303', name:'Tapan',         basicRent:6200, lastReading:9695,  factor:8, sweeper:130, water:60,  balancePrev:358},
-  {room:'B-401', name:'Lavkush',       basicRent:9000, lastReading:5125,  factor:8, sweeper:130, water:60,  balancePrev:25},
-  {room:'B-402', name:'Amarjeet',      basicRent:6000, lastReading:9761,  factor:8, sweeper:130, water:40,  balancePrev:50},
-  {room:'B-403', name:'Pooja',         basicRent:6200, lastReading:2268,  factor:8, sweeper:130, water:40,  balancePrev:0},
-  {room:'B-501', name:'Kailash',       basicRent:9500, lastReading:1445,  factor:8, sweeper:130, water:50,  balancePrev:5776},
-  {room:'B-502', name:'Ravi',          basicRent:6000, lastReading:466,   factor:8, sweeper:130, water:50,  balancePrev:18},
-  {room:'B-503', name:'Rashid',        basicRent:6300, lastReading:315,   factor:8, sweeper:130, water:40,  balancePrev:0},
-  {room:'B-601', name:'Dinesh Meena',  basicRent:6200, lastReading:352,   factor:8, sweeper:130, water:30,  balancePrev:0},
-  {room:'B-602', name:'Vikas',         basicRent:0,    lastReading:237,   factor:8, sweeper:0,   water:0,   balancePrev:3600},
-];
-const SEED_MONTH_KEY = '2026-08';
-const SEED_CURRENT_READINGS = {
-  'B-001':8263,'B-002':6357,'B-003':1230,'B-101':6165,'B-102':1290,'B-103':4770,
-  'B-201':1084,'B-202':15416,'B-203':282,'B-301':4635,'B-302':1870,'B-303':9773,
-  'B-401':5203,'B-402':9877,'B-403':2401,'B-501':1663,'B-502':595,'B-503':348,
-  'B-601':433,'B-602':240
-};
+const STORAGE_KEY = 'kiraya-book-v1';
+let state = null;
 
-/* ---------- Storage ---------- */
-const STORAGE_KEY = 'kiraya_book_state_v1';
-function saveState(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){
-    if(window.storage && window.storage.set){
-      try{ window.storage.set(STORAGE_KEY, JSON.stringify(state)); }catch(e2){}
-    }
-  }
-}
-function loadState(){
-  let raw = null;
-  try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){}
-  if(raw){
-    try{ state = JSON.parse(raw); render(); return; }catch(e){}
-  }
-  if(window.storage && window.storage.get){
-    window.storage.get(STORAGE_KEY).then(r=>{
-      if(r && r.value){ try{ state = JSON.parse(r.value); }catch(e){} }
-      render();
-    }).catch(()=> render());
-  } else {
-    render();
-  }
-}
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-/* ---------- State ---------- */
-function uid(){ return 't_' + Math.random().toString(36).slice(2,10); }
-function roomSortKey(room){
-  const m = String(room).match(/^([A-Za-z]*)-?(\d+)/);
-  if(!m) return room;
-  return m[1] + String(m[2]).padStart(5,'0');
-}
-function sortByRoom(list){
-  return [...list].sort((a,b)=> roomSortKey(a.room).localeCompare(roomSortKey(b.room)));
-}
-
-function buildInitialState(){
-  const tenants = SEED_TENANTS.map(s=>({
-    id: uid(), room:s.room, name:s.name, phone:'', phone2:'', basicRent:s.basicRent, active:true
-  }));
-  const records = {};
-  tenants.forEach((t,i)=>{
-    const seed = SEED_TENANTS[i];
-    records[t.id] = {
-      currentReading: SEED_CURRENT_READINGS[t.room] || seed.lastReading,
-      lastReading: seed.lastReading,
-      factor: seed.factor,
-      sweeper: seed.sweeper,
-      water: seed.water,
-      balancePrev: seed.balancePrev,
-      rentPaid: 0,
-      paid: false,
-      lateFeeApplied: false
-    };
-  });
-  return {
-    activeMonth: SEED_MONTH_KEY,
-    tenants,
-    months: { [SEED_MONTH_KEY]: { records } },
-    templates: {
-      reminder: "Dear {name},\n\nGreetings from Pankaj S/o Mahender Apartments.\n\nYour rent details for {month} — Room {room}:\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nPrevious Balance: ₹{balancePrev}\nTotal: ₹{total}\nPaid: ₹{paid}\nBalance Due: ₹{due}\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
-      late: "Dear {name},\n\nThis is a reminder that your rent for {month} — Room {room} — is still pending.\n\nTotal Due: ₹{due}\n\nA late charge may apply if payment is not received soon. Please pay at the earliest to avoid this. Thank you!",
-      receipt: "Dear {name},\n\nThank you! We have received your payment of ₹{paid} for {month}, Room {room}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nTotal: ₹{total}\nBalance Carried Forward: ₹{balanceNext}\n\nThank you for staying with us!"
-    },
-    settings: { dueDay: 10, lateFee: 200 },
-    ui: { tab:'dashboard', bannerDismissed:false }
-  };
-}
-
-let state = buildInitialState();
-
-/* ---------- Month helpers ---------- */
-function ensureMonth(key){
-  if(!state.months[key]){
-    const prevKey = shiftMonth(key,-1);
-    const prevMonth = state.months[prevKey];
-    const records = {};
-    state.tenants.forEach(t=>{
-      const prevRec = prevMonth ? prevMonth.records[t.id] : null;
-      const carry = prevRec ? computeRecord(prevRec, t).due : 0;
-      records[t.id] = {
-        currentReading: prevRec ? prevRec.currentReading : 0,
-        lastReading: prevRec ? prevRec.currentReading : 0,
-        factor: prevRec ? prevRec.factor : 8,
-        sweeper: prevRec ? prevRec.sweeper : 130,
-        water: prevRec ? prevRec.water : 40,
-        balancePrev: Math.max(0, carry),
-        rentPaid: 0,
-        paid: false,
-        lateFeeApplied: false
-      };
-    });
-    state.months[key] = { records };
-  }
-  return state.months[key];
-}
-function shiftMonth(key, delta){
-  const [y,m] = key.split('-').map(Number);
-  const d = new Date(y, m-1+delta, 1);
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-}
+function monthKey(y,m){ return y + '-' + String(m).padStart(2,'0'); }
 function monthLabel(key){
   const [y,m] = key.split('-').map(Number);
-  const names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  return names[m-1] + ' ' + y;
+  return MONTH_NAMES[m-1] + ' ' + y;
+}
+function shiftMonth(key, delta){
+  let [y,m] = key.split('-').map(Number);
+  m += delta;
+  while(m>12){ m-=12; y++; }
+  while(m<1){ m+=12; y--; }
+  return monthKey(y,m);
+}
+function uid(){ return 't' + Math.random().toString(36).slice(2,9); }
+
+function sortByRoom(list){
+  return list.slice().sort((a,b)=> a.room.localeCompare(b.room, undefined, {numeric:true, sensitivity:'base'}));
 }
 
-/* ---------- Calculation ---------- */
-function computeRecord(rec, tenant){
-  const units = Math.max(0, (Number(rec.currentReading)||0) - (Number(rec.lastReading)||0));
-  const electricity = units * (Number(rec.factor)||0);
-  const displayElectricity = electricity + (Number(rec.water)||0); // water folded in for tenant view
-  const isLate = isPastDue() && !rec.paid;
-  const lateFee = isLate ? (Number(state.settings.lateFee)||0) : 0;
-  const total = (Number(tenant.basicRent)||0) + electricity + (Number(rec.sweeper)||0) + (Number(rec.water)||0) + (Number(rec.balancePrev)||0) + lateFee;
-  const due = Math.max(0, total - (Number(rec.rentPaid)||0));
-  return { units, electricity, displayElectricity, total, due, lateFee, isLate };
+function defaultTenants(){
+  return [
+    {id:'r001', room:'B-001', name:'Rakesh', phone:'9718631107', phone2:'9650840791', basicRent:6200, active:true},
+    {id:'r002', room:'B-002', name:'Jai Narayan', phone:'8882894608', phone2:'', basicRent:6000, active:true},
+    {id:'r003', room:'B-003', name:'Budiya', phone:'8826406574', phone2:'9821810880', basicRent:6200, active:true},
+    {id:'r004', room:'B-101', name:'Dinesh', phone:'9868790248', phone2:'9968509224', basicRent:9000, active:true},
+    {id:'r005', room:'B-102', name:'Praveen', phone:'9971444079', phone2:'9868044084', basicRent:6000, active:true},
+    {id:'r006', room:'B-103', name:'Mantu', phone:'9643507629', phone2:'', basicRent:6200, active:true},
+    {id:'r007', room:'B-201', name:'Vishnu', phone:'9015772060', phone2:'8920613735', basicRent:9000, active:true},
+    {id:'r008', room:'B-202', name:'Jyoti', phone:'9625406321', phone2:'8585919675', basicRent:6100, active:true},
+    {id:'r009', room:'B-203', name:'Meera', phone:'9873248913', phone2:'', basicRent:6200, active:true},
+    {id:'r010', room:'B-301', name:'Keshar', phone:'8800274403', phone2:'', basicRent:9500, active:true},
+    {id:'r011', room:'B-302', name:'Ajay Sharma', phone:'9520070046', phone2:'', basicRent:6000, active:true},
+    {id:'r012', room:'B-303', name:'Tapan', phone:'7012743940', phone2:'', basicRent:6200, active:true},
+    {id:'r013', room:'B-401', name:'Lavkush', phone:'8826664976', phone2:'8809162594', basicRent:9000, active:true},
+    {id:'r014', room:'B-402', name:'Amarjeet', phone:'9999142214', phone2:'8826067764', basicRent:6000, active:true},
+    {id:'r015', room:'B-403', name:'Pooja', phone:'9368279069', phone2:'', basicRent:6200, active:true},
+    {id:'r016', room:'B-501', name:'Kailash', phone:'9871511654', phone2:'', basicRent:9500, active:true},
+    {id:'r017', room:'B-502', name:'Ravi', phone:'8860152015', phone2:'9267915715', basicRent:6000, active:true},
+    {id:'r018', room:'B-503', name:'Rashid', phone:'9118995156', phone2:'', basicRent:6300, active:true},
+    {id:'r019', room:'B-601', name:'Dinesh Meena', phone:'8949217546', phone2:'', basicRent:6200, active:true},
+    {id:'r020', room:'B-602', name:'Vacant', phone:'', phone2:'', basicRent:2700, active:false}
+  ];
 }
-function isPastDue(){
-  const today = new Date();
-  const activeYm = state.activeMonth;
-  const nowYm = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0');
-  if(activeYm < nowYm) return true;
-  if(activeYm > nowYm) return false;
-  return today.getDate() > (Number(state.settings.dueDay)||10);
-}
-function fmt(n){ return '₹' + Math.round(n||0).toLocaleString('en-IN'); }
 
-/* ---------- Template fill ---------- */
-function fillTemplate(tpl, tenant, rec, c){
-  const month = ensureMonth(state.activeMonth);
-  const balanceNext = c.due;
-  const map = {
-    name: tenant.name, room: tenant.room, month: monthLabel(state.activeMonth),
-    rent: tenant.basicRent, electricity: c.displayElectricity, sweeper: rec.sweeper, water: rec.water,
-    balancePrev: rec.balancePrev, total: c.total, paid: rec.rentPaid, due: c.due,
-    balanceNext: balanceNext, dueDay: state.settings.dueDay
+function defaultAugRecords(){
+  // Seeded from the user's Aug 2026 sheet: [tenantId, current, last, sweeper, water, balancePrev]
+  const rows = [
+    ['r001',8263,8144,130,40,68],
+    ['r002',6357,6309,130,80,232],
+    ['r003',1230,1110,130,50,4],
+    ['r004',6165,5976,130,40,4],
+    ['r005',1290,1270,130,40,250],
+    ['r006',4770,4744,130,50,26],
+    ['r007',1084,814,130,40,40],
+    ['r008',15416,15222,130,60,64],
+    ['r009',282,215,130,50,50],
+    ['r010',4635,4490,130,50,2350],
+    ['r011',1870,1870,130,50,0],
+    ['r012',9773,9695,130,60,358],
+    ['r013',5203,5125,130,60,25],
+    ['r014',9877,9761,130,40,50],
+    ['r015',2401,2268,130,40,0],
+    ['r016',1663,1445,130,50,5776],
+    ['r017',595,466,130,50,18],
+    ['r018',348,315,130,40,0],
+    ['r019',433,352,130,30,0],
+    ['r020',240,237,0,0,3600]
+  ];
+  const recs = {};
+  rows.forEach(([id,cur,last,sw,water,balPrev])=>{
+    recs[id] = {currentReading:cur, lastReading:last, factor:8, sweeper:sw, water:water, balancePrev:balPrev, rentPaid:0};
+  });
+  return recs;
+}
+
+function defaultState(){
+  return {
+    tenants: defaultTenants(),
+    months: { '2026-08': { records: defaultAugRecords() } },
+    activeMonth: '2026-08',
+    ui: { tab:'dashboard', bannerDismissed:false },
+    settings: { dueDay: 10, lateFeeAmount: 100 },
+    templates: {
+      reminder: "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!",
+      receipt: "Hi {name} 🙏\nRent received for Room {room} — {month}.\n\nAmount Paid: ₹{paid}\nTotal Due was: ₹{total}\nBalance carried forward: ₹{balanceNext}\n\nThank you for your payment! 🙏",
+      late: "Hi {name} 🙏\nThis is regarding Room {room} — {month} rent.\n\n*Total Due (incl. late charge): ₹{due}*\n(Rent was due by the {dueDay}th; a late charge of ₹{lateFeeAmount} has been added.)\n\nPlease clear this at the earliest to avoid further charges. Thank you."
+    }
   };
-  return tpl.replace(/\{(\w+)\}/g, (m,k)=> (k in map) ? map[k] : m);
 }
 
-/* ---------- Toast & Modal ---------- */
-let toastTimer;
+const PHONE_BOOK = {
+  r001:{phone:'9718631107', phone2:'9650840791'},
+  r002:{phone:'8882894608', phone2:''},
+  r003:{phone:'8826406574', phone2:'9821810880'},
+  r004:{phone:'9868790248', phone2:'9968509224'},
+  r005:{phone:'9971444079', phone2:'9868044084'},
+  r006:{phone:'9643507629', phone2:''},
+  r007:{phone:'9015772060', phone2:'8920613735'},
+  r008:{phone:'9625406321', phone2:'8585919675'},
+  r009:{phone:'9873248913', phone2:''},
+  r010:{phone:'8800274403', phone2:''},
+  r011:{phone:'9520070046', phone2:''},
+  r012:{phone:'7012743940', phone2:''},
+  r013:{phone:'8826664976', phone2:'8809162594'},
+  r014:{phone:'9999142214', phone2:'8826067764'},
+  r015:{phone:'9368279069', phone2:''},
+  r016:{phone:'9871511654', phone2:''},
+  r017:{phone:'8860152015', phone2:'9267915715'},
+  r018:{phone:'9118995156', phone2:''},
+  r019:{phone:'8949217546', phone2:''}
+};
+
+function migratePhoneBook(){
+  let changed = false;
+  state.tenants.forEach(t=>{
+    const entry = PHONE_BOOK[t.id];
+    if(!entry) return;
+    if(!t.phone && entry.phone){ t.phone = entry.phone; changed = true; }
+    if(t.phone==='94643507629'){ t.phone = '9643507629'; changed = true; } // fix known typo
+    if(t.phone2===undefined) t.phone2 = '';
+    if(!t.phone2 && entry.phone2){ t.phone2 = entry.phone2; changed = true; }
+  });
+  if(changed) saveState();
+}
+
+async function loadState(){
+  try{
+    const r = await window.storage.get(STORAGE_KEY);
+    state = r && r.value ? JSON.parse(r.value) : defaultState();
+  }catch(e){
+    state = defaultState();
+  }
+  if(!state.ui) state.ui = {tab:'dashboard', bannerDismissed:false};
+  if(!state.settings) state.settings = { dueDay: 10, lateFeeAmount: 100 };
+  if(state.templates && !state.templates.late){
+    state.templates.late = "Hi {name} 🙏\nThis is regarding Room {room} — {month} rent.\n\n*Total Due (incl. late charge): ₹{due}*\n(Rent was due by the {dueDay}th; a late charge of ₹{lateFeeAmount} has been added.)\n\nPlease clear this at the earliest to avoid further charges. Thank you.";
+  }
+  if(state.templates && state.templates.reminder === "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nPlease pay by the {dueDay}th to avoid a late charge of ₹{lateFeeAmount}. Kindly pay at your earliest convenience. Thank you!"){
+    state.templates.reminder = "Hi {name} 🙏\nRent reminder for Room {room} — {month}.\n\nBasic Rent: ₹{rent}\nElectricity: ₹{electricity}\nSweeper: ₹{sweeper}\nWater: ₹{water}\nPrevious balance: ₹{balancePrev}\n*Total Due: ₹{total}*\n\nKindly pay at your earliest convenience, before due date {dueDay}th {month} to avoid late charges. Thank you!";
+  }
+  if(!state.months[state.activeMonth]) {
+    const keys = Object.keys(state.months).sort();
+    state.activeMonth = keys.length ? keys[keys.length-1] : '2026-08';
+  }
+  migratePhoneBook();
+  render();
+}
+
+let saveTimer=null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ console.error('save failed', e); }
+  }, 300);
+}
+
+function tenantById(id){ return state.tenants.find(t=>t.id===id); }
+
+function ensureMonth(key){
+  if(state.months[key]) return state.months[key];
+  const prevKey = shiftMonth(key, -1);
+  const prev = state.months[prevKey];
+  const records = {};
+  state.tenants.filter(t=>t.active).forEach(t=>{
+    const prevRec = prev ? prev.records[t.id] : null;
+    const prevComputed = prevRec ? computeRecord(prevRec, t, prevKey) : null;
+    records[t.id] = {
+      currentReading: prevRec ? prevRec.currentReading : 0,
+      lastReading: prevRec ? prevRec.currentReading : 0,
+      factor: 8,
+      sweeper: prevRec ? prevRec.sweeper : 130,
+      water: prevRec ? prevRec.water : 0,
+      balancePrev: prevComputed ? prevComputed.due : 0,
+      rentPaid: 0
+    };
+  });
+  state.months[key] = { records };
+  return state.months[key];
+}
+
+function isPastDueDate(monthKey, dueDay){
+  const [y,m] = monthKey.split('-').map(Number);
+  const dueDate = new Date(y, m-1, dueDay, 23, 59, 59);
+  return new Date() > dueDate;
+}
+
+function computeRecord(rec, tenant, monthKey){
+  monthKey = monthKey || state.activeMonth;
+  const reading = Math.max(0, (rec.currentReading||0) - (rec.lastReading||0));
+  const electricity = reading * (rec.factor||8);
+  const total = (tenant.basicRent||0) + electricity + (rec.sweeper||0) + (rec.water||0) + (rec.balancePrev||0);
+  const outstanding = Math.max(0, total - (rec.rentPaid||0));
+  const dueDay = (state.settings && state.settings.dueDay) || 10;
+  const lateFeeAmount = (state.settings && state.settings.lateFeeAmount) || 0;
+  let lateFeeApplied = 0;
+  if(outstanding > 0 && lateFeeAmount > 0 && isPastDueDate(monthKey, dueDay)){
+    lateFeeApplied = lateFeeAmount;
+  }
+  const due = outstanding + lateFeeApplied;
+  return { reading, electricity, total, due, lateFeeApplied, isLate: lateFeeApplied>0 };
+}
+
+function fmt(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
 function toast(msg){
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> el.classList.remove('show'), 2200);
+  setTimeout(()=>el.classList.remove('show'), 1800);
 }
-function confirmDialog(title, body, onConfirm){
-  const overlay = document.getElementById('modalOverlay');
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalBody').textContent = body;
-  overlay.classList.add('show');
-  const confirmBtn = document.getElementById('modalConfirm');
-  const cancelBtn = document.getElementById('modalCancel');
-  function cleanup(){
-    overlay.classList.remove('show');
-    confirmBtn.onclick = null; cancelBtn.onclick = null;
+
+function fillTemplate(tpl, tenant, rec, computed){
+  const map = {
+    name: tenant.name,
+    room: tenant.room,
+    month: monthLabel(state.activeMonth),
+    rent: tenant.basicRent,
+    electricity: computed.electricity,
+    sweeper: rec.sweeper||0,
+    water: rec.water||0,
+    balancePrev: rec.balancePrev||0,
+    total: computed.total,
+    paid: rec.rentPaid||0,
+    due: computed.due,
+    balanceNext: computed.due,
+    dueDay: (state.settings && state.settings.dueDay) || 10,
+    lateFeeAmount: (state.settings && state.settings.lateFeeAmount) || 0,
+    lateFee: computed.lateFeeApplied || 0
+  };
+  return tpl.replace(/\{(\w+)\}/g, (m,k)=> (k in map) ? map[k] : m);
+}
+
+function normalizePhone(phone){
+  let d = (phone||'').replace(/\D/g,'');
+  if(!d) return '';
+  if(d.length===10) d = '91' + d; // default India country code
+  return d;
+}
+
+function sendWhatsApp(tenantId, kind){
+  const t = tenantById(tenantId);
+  const rec = state.months[state.activeMonth].records[tenantId];
+  const computed = computeRecord(rec, t);
+  const phone = normalizePhone(t.phone);
+  if(!phone){
+    toast('Add a phone number for ' + t.name + ' first');
+    switchTab('tenants');
+    return;
   }
-  confirmBtn.onclick = ()=>{ cleanup(); onConfirm(); };
-  cancelBtn.onclick = ()=> cleanup();
+  const tpl = kind==='reminder' ? state.templates.reminder : kind==='late' ? state.templates.late : state.templates.receipt;
+  const text = fillTemplate(tpl, t, rec, computed);
+  const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+function switchTab(tab){
+  state.ui.tab = tab;
+  render();
+}
+
+function updateField(tenantId, field, value){
+  const rec = state.months[state.activeMonth].records[tenantId];
+  if(field==='rentPaid' || field==='currentReading' || field==='sweeper' || field==='water'){
+    rec[field] = value === '' ? 0 : Number(value);
+  }
+  saveState();
+  if(field==='water'){ render(); } else { refreshCard(tenantId); }
+}
+
+function refreshCard(tenantId){
+  const t = tenantById(tenantId);
+  const rec = state.months[state.activeMonth].records[tenantId];
+  const c = computeRecord(rec, t);
+  const elecEl = document.getElementById('elec-'+tenantId);
+  const totalEl = document.getElementById('total-'+tenantId);
+  const dueEl = document.getElementById('due-'+tenantId);
+  const pillEl = document.getElementById('pill-'+tenantId);
+  if(elecEl) elecEl.textContent = fmt(c.electricity);
+  if(totalEl) totalEl.textContent = fmt(c.total);
+  if(dueEl){
+    dueEl.textContent = c.due>0 ? fmt(c.due) : 'Paid in full';
+    dueEl.className = 'tval ' + (c.due>0 ? 'due' : 'paid');
+  }
+  if(pillEl){
+    pillEl.textContent = c.isLate ? 'Late' : (c.due>0 ? 'Due' : 'Paid');
+    pillEl.className = 'status-pill ' + (c.due>0 ? 'due':'paid');
+  }
+}
+
+function markPaid(tenantId){
+  const t = tenantById(tenantId);
+  const rec = state.months[state.activeMonth].records[tenantId];
+  const c = computeRecord(rec, t);
+  rec.rentPaid = c.total + c.lateFeeApplied;
+  saveState();
+  render();
 }
 
 /* ---------- Rendering ---------- */
-function switchTab(tab){
-  state.ui.tab = tab;
-  saveState();
-  render();
-  window.scrollTo(0,0);
-}
 
 function render(){
-  document.getElementById('monthLabel').textContent = monthLabel(state.activeMonth);
   document.querySelectorAll('.tabbar button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab === state.ui.tab);
+    b.classList.toggle('active', b.dataset.tab===state.ui.tab);
   });
+  document.getElementById('monthLabel').textContent = monthLabel(state.activeMonth);
+  const isCurrent = state.months[state.activeMonth];
+  document.getElementById('monthSub').textContent = isCurrent ? 'Ledger open' : 'No data yet';
 
   const root = document.getElementById('app-content');
   root.innerHTML = '';
@@ -444,12 +599,10 @@ function render(){
 
 function renderInstallBanner(){
   if(state.ui.bannerDismissed) return null;
-  const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  if(isStandalone) return null;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const div = document.createElement('div');
   div.className = 'install-banner';
-  div.innerHTML = `<span>📲</span><span><b>Add to Home Screen</b> to use Kiraya Book like an app${isIOS ? ': tap the Share icon in Safari, then "Add to Home Screen".' : ' from your browser menu.'}</span><button id="dismissBanner">Got it</button>`;
+  div.innerHTML = `<span>📲</span><span><b>Add to Home Screen</b> to use Pankaj Apartments like an app${isIOS ? ': tap the Share icon in Safari, then "Add to Home Screen".' : ' from your browser menu.'}</span><button id="dismissBanner">Got it</button>`;
   div.querySelector('#dismissBanner').onclick = ()=>{ state.ui.bannerDismissed=true; saveState(); render(); };
   return div;
 }
@@ -457,7 +610,7 @@ function renderInstallBanner(){
 function renderDashboard(){
   const wrap = document.createElement('div');
   const month = ensureMonth(state.activeMonth);
-  const active = sortByRoom(state.tenants.filter(t=>t.active));
+  const active = state.tenants.filter(t=>t.active);
   let collected=0, due=0, pendingCount=0;
   const pending = [];
   active.forEach(t=>{
@@ -475,140 +628,114 @@ function renderDashboard(){
       <div class="stat-card"><div class="label">Tenants</div><div class="value mono">${active.length}</div></div>
       <div class="stat-card"><div class="label">Pending</div><div class="value mono">${pendingCount}</div></div>
     </div>
-    <div class="section-title">Pending Payments<span class="count">${pendingCount}</span></div>
+    <div class="section-title">Pending payments <span class="count">${pendingCount} of ${active.length}</span></div>
   `;
 
   if(pending.length===0){
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = '🎉 Sab collect ho gaya is mahine ke liye!';
-    wrap.appendChild(empty);
+    const e = document.createElement('div');
+    e.className='empty';
+    e.textContent = 'Everyone has paid for ' + monthLabel(state.activeMonth) + ' 🎉';
+    wrap.appendChild(e);
   } else {
-    pending.sort((a,b)=> b.c.due - a.c.due).forEach(({t,c})=>{
+    sortByRoom(pending.map(p=>p.t)).map(t=>pending.find(p=>p.t.id===t.id)).forEach(({t,c})=>{
       const card = document.createElement('div');
-      card.className = 'pending-card' + (c.isLate ? ' late' : '');
+      card.className = 'tenant-card';
       card.innerHTML = `
-        <div>
-          <div class="name">${t.name}${c.isLate ? '<span class="late-tag">LATE</span>' : ''}</div>
-          <div class="room">${t.room}</div>
+        <div class="row1">
+          <div class="who">
+            <div class="room">${t.room}</div>
+            <div class="name">${t.name}</div>
+          </div>
+          <span class="status-pill due">${c.isLate?'Late':'Due'}</span>
         </div>
-        <div class="amt mono">${fmt(c.due)}</div>
+        <div class="totals-row">
+          <div class="tlabel">Amount due${c.lateFeeApplied>0?' (incl. late charge)':''}</div>
+          <div class="tval due mono">${fmt(c.due)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-wa" data-wa="${t.id}" style="${c.isLate?'background:var(--due);':''}">${c.isLate?'WhatsApp Late Notice':'WhatsApp Reminder'}</button>
+        </div>
       `;
-      card.onclick = ()=>{ switchTab('collect'); };
+      card.querySelector('[data-wa]').onclick = ()=>sendWhatsApp(t.id, c.isLate ? 'late' : 'reminder');
       wrap.appendChild(card);
     });
   }
-
-  const settingsBlock = document.createElement('div');
-  settingsBlock.className = 'settings-block';
-  settingsBlock.innerHTML = `
-    <h3>Late Charge Settings</h3>
-    <div class="field-grid">
-      <div class="field"><label>Due Day of Month</label><input type="number" id="dueDayInput" value="${state.settings.dueDay}" min="1" max="28"></div>
-      <div class="field"><label>Late Fee (₹)</label><input type="number" id="lateFeeInput" value="${state.settings.lateFee}" min="0"></div>
-    </div>
-  `;
-  settingsBlock.querySelector('#dueDayInput').addEventListener('change', e=>{
-    state.settings.dueDay = Number(e.target.value||10); saveState(); render();
-  });
-  settingsBlock.querySelector('#lateFeeInput').addEventListener('change', e=>{
-    state.settings.lateFee = Number(e.target.value||0); saveState(); render();
-  });
-  wrap.appendChild(settingsBlock);
-
   return wrap;
 }
 
 function renderCollect(){
   const wrap = document.createElement('div');
-  wrap.innerHTML = `<div class="section-title">Collect Rent<span class="count">${state.tenants.filter(t=>t.active).length}</span></div>`;
   const month = ensureMonth(state.activeMonth);
+  const active = sortByRoom(state.tenants.filter(t=>t.active));
 
-  sortByRoom(state.tenants.filter(t=>t.active)).forEach(t=>{
+  const summary = document.createElement('div');
+  const totalDue = active.reduce((s,t)=>s+computeRecord(month.records[t.id],t).due,0);
+  summary.className='month-summary-bar';
+  summary.innerHTML = `<span>${active.length} tenants</span><span>Outstanding: <b class="mono">${fmt(totalDue)}</b></span>`;
+  wrap.appendChild(summary);
+
+  active.forEach(t=>{
     const rec = month.records[t.id];
     const c = computeRecord(rec, t);
     const card = document.createElement('div');
     card.className = 'tenant-card';
     card.innerHTML = `
-      <div class="head">
-        <div>
-          <div class="name">${t.name}</div>
+      <div class="row1">
+        <div class="who">
           <div class="room">${t.room}</div>
+          <div class="name">${t.name}</div>
         </div>
-        <div class="status-pill ${rec.paid ? 'paid' : 'due'}">${rec.paid ? 'PAID' : (c.isLate ? 'LATE' : 'DUE')}</div>
+        <span class="status-pill ${c.isLate?'due':(c.due>0?'due':'paid')}" id="pill-${t.id}">${c.isLate?'Late':(c.due>0?'Due':'Paid')}</span>
       </div>
-      <div class="field-grid">
-        <div class="field"><label>Last Reading</label><input type="number" data-f="lastReading" value="${rec.lastReading}"></div>
-        <div class="field"><label>Current Reading</label><input type="number" data-f="currentReading" value="${rec.currentReading}"></div>
-        <div class="field"><label>Unit Rate (₹)</label><input type="number" data-f="factor" value="${rec.factor}"></div>
-        <div class="field"><label>Sweeper (₹)</label><input type="number" data-f="sweeper" value="${rec.sweeper}"></div>
-        <div class="field"><label>Water (₹)</label><input type="number" data-f="water" value="${rec.water}"></div>
-        <div class="field"><label>Prev. Balance (₹)</label><input type="number" data-f="balancePrev" value="${rec.balancePrev}"></div>
+      <div class="grid-inputs">
+        <div class="field"><label>Meter (Last)</label><input type="number" value="${rec.lastReading}" disabled></div>
+        <div class="field"><label>Meter (Current)</label><input type="number" value="${rec.currentReading}" data-f="currentReading" data-t="${t.id}"></div>
+        <div class="field"><label>Sweeper (₹)</label><input type="number" value="${rec.sweeper}" data-f="sweeper" data-t="${t.id}"></div>
+        <div class="field"><label>Water (₹)</label><input type="number" value="${rec.water}" data-f="water" data-t="${t.id}"></div>
       </div>
-      <div class="calc-strip">
-        <div class="lbl">Units used</div><div class="v">${c.units}</div>
-        <div class="lbl">Electricity</div><div class="v">${fmt(c.electricity)}</div>
-        <div class="lbl">Basic Rent</div><div class="v">${fmt(t.basicRent)}</div>
-        <div class="lbl">Sweeper + Water</div><div class="v">${fmt(Number(rec.sweeper)+Number(rec.water))}</div>
-        ${c.lateFee>0 ? `<div class="lbl">Late Fee</div><div class="v">${fmt(c.lateFee)}</div>` : ''}
-        <div class="total-row"><div class="lbl">Total Rent</div><div class="v mono">${fmt(c.total)}</div></div>
-        <div class="field" style="grid-column:1/-1; margin-top:2px;"><label>Rent Paid (₹)</label><input type="number" data-f="rentPaid" value="${rec.rentPaid}"></div>
-        <div class="due-row"><div class="lbl">Balance Due</div><div class="v mono" style="color:${c.due>0?'var(--red)':'var(--green)'}">${fmt(c.due)}</div></div>
+      <div class="breakdown">
+        <span>Basic: <b class="mono">${fmt(t.basicRent)}</b></span>
+        <span>${rec.water>0 ? 'Electricity' : 'Electricity (+ Water)'}: <b class="mono" id="elec-${t.id}">${fmt(c.electricity + (rec.water>0?0:(rec.water||0)))}</b></span>
+        ${rec.water>0 ? `<span>Water: <b class="mono">${fmt(rec.water)}</b></span>` : ''}
+        <span>Prev. balance: <b class="mono">${fmt(rec.balancePrev)}</b></span>
+        ${c.lateFeeApplied>0 ? `<span style="color:var(--due);">Late charge (after ${state.settings.dueDay}th): <b class="mono">${fmt(c.lateFeeApplied)}</b></span>` : ''}
       </div>
-      <div class="btn-row">
-        ${rec.paid
-          ? `<button class="btn btn-unpaid" data-act="unpaid">Mark Unpaid</button>`
-          : `<button class="btn btn-paid" data-act="paid">Mark Paid</button>`}
-        <button class="btn btn-wa" data-act="wa">WhatsApp</button>
+      <div class="grid-inputs" style="margin-top:10px;">
+        <div class="field" style="grid-column:1/3;"><label>Rent Paid (₹)</label><input type="number" value="${rec.rentPaid||''}" placeholder="0" data-f="rentPaid" data-t="${t.id}"></div>
+      </div>
+      <div class="totals-row">
+        <div>
+          <div class="tlabel">Total rent</div>
+          <div class="mono" id="total-${t.id}" style="font-size:14px;">${fmt(c.total)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tlabel">${c.due>0?'Balance due':'Status'}</div>
+          <div class="tval ${c.due>0?'due':'paid'} mono" id="due-${t.id}">${c.due>0?fmt(c.due):'Paid in full'}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-ghost" data-mark="${t.id}">Mark Paid</button>
+        <button class="btn btn-wa" data-wa-r="${t.id}" style="${c.isLate?'background:var(--due);':''}">${c.isLate?'Late Fee Notice':'Remind'}</button>
+        <button class="btn btn-wa" data-wa-p="${t.id}" style="background:var(--wa-dark);">Receipt</button>
       </div>
     `;
     card.querySelectorAll('input[data-f]').forEach(inp=>{
-      inp.addEventListener('change', ()=>{
-        rec[inp.dataset.f] = Number(inp.value||0);
-        saveState();
-        render();
-      });
+      inp.addEventListener('change', ()=> updateField(t.id, inp.dataset.f, inp.value));
     });
-    const paidBtn = card.querySelector('[data-act="paid"]');
-    if(paidBtn){
-      paidBtn.onclick = ()=>{
-        confirmDialog('Mark as Paid?', `${t.name} (${t.room}) ko is mahine paid mark karna hai?`, ()=>{
-          rec.paid = true;
-          if(rec.rentPaid < c.total) rec.rentPaid = c.total;
-          saveState(); render();
-          toast('Marked as paid ✓');
-        });
-      };
-    }
-    const unpaidBtn = card.querySelector('[data-act="unpaid"]');
-    if(unpaidBtn){
-      unpaidBtn.onclick = ()=>{
-        confirmDialog('Mark as Unpaid?', `${t.name} (${t.room}) ka paid status reverse karna hai?`, ()=>{
-          rec.paid = false;
-          saveState(); render();
-          toast('Marked as unpaid');
-        });
-      };
-    }
-    card.querySelector('[data-act="wa"]').onclick = ()=>{
-      openWhatsApp(t, rec, c);
-    };
+    card.querySelector('[data-mark]').onclick = ()=>markPaid(t.id);
+    card.querySelector('[data-wa-r]').onclick = ()=>sendWhatsApp(t.id, c.isLate ? 'late' : 'reminder');
+    card.querySelector('[data-wa-p]').onclick = ()=>sendWhatsApp(t.id,'receipt');
     wrap.appendChild(card);
   });
 
-  return wrap;
-}
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'new-month-btn';
+  const nextKey = shiftMonth(state.activeMonth, 1);
+  nextBtn.textContent = state.months[nextKey] ? 'Go to ' + monthLabel(nextKey) : 'Start ' + monthLabel(nextKey) + ' →';
+  nextBtn.onclick = ()=>{ ensureMonth(nextKey); state.activeMonth = nextKey; saveState(); render(); };
+  wrap.appendChild(nextBtn);
 
-function openWhatsApp(tenant, rec, c){
-  const kind = (rec.paid) ? 'receipt' : (c.isLate ? 'late' : 'reminder');
-  const tpl = state.templates[kind];
-  const msg = fillTemplate(tpl, tenant, rec, c);
-  const phone = (tenant.phone || '').replace(/[^0-9]/g,'');
-  const withCountry = phone.length===10 ? '91'+phone : phone;
-  const url = withCountry
-    ? `https://wa.me/${withCountry}?text=${encodeURIComponent(msg)}`
-    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
+  return wrap;
 }
 
 function renderTenants(){
@@ -626,8 +753,8 @@ function renderTenants(){
       <div class="grid-inputs">
         <div class="field"><label>Room</label><input type="text" value="${t.room}" data-tf="room" data-t="${t.id}"></div>
         <div class="field"><label>Name</label><input type="text" value="${t.name}" data-tf="name" data-t="${t.id}"></div>
-        <div class="field"><label>Phone (Primary)</label><input type="text" placeholder="9xxxxxxxxx" value="${t.phone}" data-tf="phone" data-t="${t.id}"></div>
-        <div class="field"><label>Phone (Secondary)</label><input type="text" placeholder="9xxxxxxxxx" value="${t.phone2||''}" data-tf="phone2" data-t="${t.id}"></div>
+        <div class="field"><label>Phone (WhatsApp)</label><input type="text" placeholder="+91 9xxxxxxxxx" value="${t.phone}" data-tf="phone" data-t="${t.id}"></div>
+        <div class="field"><label>Phone 2 (optional)</label><input type="text" placeholder="+91 9xxxxxxxxx" value="${t.phone2||''}" data-tf="phone2" data-t="${t.id}"></div>
         <div class="field"><label>Basic Rent (₹)</label><input type="number" value="${t.basicRent}" data-tf="basicRent" data-t="${t.id}"></div>
       </div>
     `;
@@ -636,7 +763,6 @@ function renderTenants(){
         const field = inp.dataset.tf;
         t[field] = field==='basicRent' ? Number(inp.value||0) : inp.value;
         saveState();
-        if(field==='room') render();
       });
     });
     row.querySelector('[data-active]').addEventListener('change', (e)=>{
@@ -644,12 +770,11 @@ function renderTenants(){
       saveState();
     });
     row.querySelector('[data-remove]').onclick = ()=>{
-      confirmDialog('Remove tenant?', `${t.name} (${t.room}) ko tenant list se remove karna hai? Purane mahine ke records nahi hatenge.`, ()=>{
+      if(confirm('Remove ' + t.name + ' from tenant list? This does not delete past month records.')){
         state.tenants = state.tenants.filter(x=>x.id!==t.id);
         saveState();
         render();
-        toast('Tenant removed');
-      });
+      }
     };
     wrap.appendChild(row);
   });
@@ -658,10 +783,7 @@ function renderTenants(){
   addBtn.className = 'add-btn';
   addBtn.textContent = '+ Add tenant / room';
   addBtn.onclick = ()=>{
-    const newT = {id:uid(), room:'New', name:'New Tenant', phone:'', phone2:'', basicRent:6000, active:true};
-    state.tenants.push(newT);
-    const month = ensureMonth(state.activeMonth);
-    month.records[newT.id] = {currentReading:0, lastReading:0, factor:8, sweeper:130, water:40, balancePrev:0, rentPaid:0, paid:false, lateFeeApplied:false};
+    state.tenants.push({id:uid(), room:'New', name:'New Tenant', phone:'', phone2:'', basicRent:6000, active:true});
     saveState();
     render();
   };
@@ -674,6 +796,28 @@ function renderMessage(){
   const sample = state.tenants.find(t=>t.active) || state.tenants[0];
   const month = ensureMonth(state.activeMonth);
 
+  const settingsBlock = document.createElement('div');
+  settingsBlock.className = 'msg-block';
+  settingsBlock.innerHTML = `
+    <h3>Due Date &amp; Late Charge</h3>
+    <p class="hint">Rent is due by this day of the month. After it passes, unpaid tenants are marked "Late" and this late charge is added automatically.</p>
+    <div class="grid-inputs">
+      <div class="field"><label>Due day of month</label><input type="number" min="1" max="31" id="dueDayInput" value="${state.settings.dueDay}"></div>
+      <div class="field"><label>Late charge (₹)</label><input type="number" min="0" id="lateFeeInput" value="${state.settings.lateFeeAmount}"></div>
+    </div>
+  `;
+  settingsBlock.querySelector('#dueDayInput').addEventListener('change', (e)=>{
+    state.settings.dueDay = Math.min(31, Math.max(1, Number(e.target.value)||10));
+    saveState();
+    render();
+  });
+  settingsBlock.querySelector('#lateFeeInput').addEventListener('change', (e)=>{
+    state.settings.lateFeeAmount = Math.max(0, Number(e.target.value)||0);
+    saveState();
+    render();
+  });
+  wrap.appendChild(settingsBlock);
+
   function block(kind, title, hint){
     const div = document.createElement('div');
     div.className = 'msg-block';
@@ -683,7 +827,7 @@ function renderMessage(){
       <p class="hint">${hint}</p>
       <textarea id="tpl-${kind}">${tpl}</textarea>
       <div class="placeholders">
-        ${['name','room','month','rent','electricity','sweeper','balancePrev','total','paid','due','balanceNext','dueDay'].map(p=>`<span class="chip" data-ins="{${p}}">{${p}}</span>`).join('')}
+        ${['name','room','month','rent','electricity','sweeper','water','balancePrev','total','paid','due','balanceNext','dueDay','lateFeeAmount'].map(p=>`<span class="chip" data-ins="{${p}}">{${p}}</span>`).join('')}
       </div>
       <div class="preview-label">Preview</div>
       <div class="preview" id="prev-${kind}"></div>
@@ -715,23 +859,19 @@ function renderMessage(){
     return div;
   }
 
-  wrap.innerHTML = '<div class="section-title">Message Templates</div>';
-  wrap.appendChild(block('reminder','Rent Reminder','Sent before the due date, or any time rent is still owed. Water charges are folded into {electricity} and never shown separately to tenants.'));
-  wrap.appendChild(block('late','Late Notice','Sent after the due date has passed for tenants who still owe money.'));
+  wrap.appendChild(block('reminder','Rent Reminder','Sent before the due date, or any time rent is still owed. Tap the chips below to insert a value into your message.'));
+  wrap.appendChild(block('late','Late Charge Notice','Appears as the button on a tenant\'s card once they are past the due day and still owe money — includes the late charge.'));
   wrap.appendChild(block('receipt','Payment Receipt','Sent any time to confirm what was paid, e.g. after you tap "Mark Paid".'));
   return wrap;
 }
 
-/* ---------- Wire up ---------- */
 document.querySelectorAll('.tabbar button').forEach(b=>{
   b.addEventListener('click', ()=>switchTab(b.dataset.tab));
 });
 document.getElementById('prevMonth').addEventListener('click', ()=>{
   const k = shiftMonth(state.activeMonth,-1);
-  ensureMonth(k);
-  state.activeMonth = k;
-  saveState();
-  render();
+  if(state.months[k]){ state.activeMonth = k; saveState(); render(); }
+  else toast('No earlier ledger for that month');
 });
 document.getElementById('nextMonth').addEventListener('click', ()=>{
   const k = shiftMonth(state.activeMonth,1);
