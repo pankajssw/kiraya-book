@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Pankaj Apartments">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
     --navy:#1B2340;
@@ -125,6 +126,22 @@
     width:100%;
   }
   .field input:focus{ outline:2px solid var(--brass-light); outline-offset:0; background:#fff;}
+  .field select{
+    border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-size:14px;
+    background:var(--paper); font-family:'Inter',sans-serif; color:var(--ink);
+    width:100%;
+  }
+  .field select:focus{ outline:2px solid var(--brass-light); outline-offset:0; background:#fff;}
+  .field textarea{
+    border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-size:13.5px;
+    background:var(--paper); font-family:'Inter',sans-serif; color:var(--ink);
+    width:100%; resize:vertical; min-height:36px;
+  }
+  .expense-row{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .expense-row .cat-badge{ font-size:10.5px; background:var(--paper-alt); color:var(--muted); padding:2px 8px; border-radius:20px; font-weight:600; display:inline-block; margin-bottom:3px; }
+  .expense-row .exp-label{ font-weight:600; font-size:14px; }
+  .expense-row .exp-note{ font-size:12px; color:var(--muted); }
+  .expense-row .exp-amt{ font-weight:700; font-size:14.5px; color:var(--due); white-space:nowrap; }
 
   .breakdown{
     margin-top:12px; padding-top:10px; border-top:1px dashed var(--line);
@@ -264,6 +281,10 @@
   <button data-tab="tenants">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M17 8a3 3 0 110 6M22 20c0-2.6-2-4.7-4.5-5.5"/></svg>
     Tenants
+  </button>
+  <button data-tab="expenses">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 4H5a2 2 0 00-2 2v13l3-2 2 2 2-2 2 2 2-2 2 2 3-2V6a2 2 0 00-2-2z"/><path d="M8 9h8M8 13h5"/></svg>
+    Expenses
   </button>
   <button data-tab="message">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.4 8.5 8.5 0 01-4-1L3 20l1.2-5a8.4 8.4 0 01-1.2-4.5A8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>
@@ -481,7 +502,10 @@ function saveState(){
 function tenantById(id){ return state.tenants.find(t=>t.id===id); }
 
 function ensureMonth(key){
-  if(state.months[key]) return state.months[key];
+  if(state.months[key]){
+    if(!state.months[key].expenses) state.months[key].expenses = [];
+    return state.months[key];
+  }
   const prevKey = shiftMonth(key, -1);
   const prev = state.months[prevKey];
   const records = {};
@@ -494,11 +518,11 @@ function ensureMonth(key){
       factor: 8,
       sweeper: prevRec ? prevRec.sweeper : 130,
       water: prevRec ? prevRec.water : 0,
-      balancePrev: prevComputed ? prevComputed.due : 0,
+      balancePrev: prevComputed ? prevComputed.net : 0,
       rentPaid: 0
     };
   });
-  state.months[key] = { records };
+  state.months[key] = { records, expenses: [] };
   return state.months[key];
 }
 
@@ -513,7 +537,8 @@ function computeRecord(rec, tenant, monthKey){
   const reading = Math.max(0, (rec.currentReading||0) - (rec.lastReading||0));
   const electricity = reading * (rec.factor||8);
   const total = (tenant.basicRent||0) + electricity + (rec.sweeper||0) + (rec.water||0) + (rec.balancePrev||0);
-  const outstanding = Math.max(0, total - (rec.rentPaid||0));
+  const net = total - (rec.rentPaid||0); // can be negative = tenant overpaid (credit for next month)
+  const outstanding = Math.max(0, net);
   const dueDay = (state.settings && state.settings.dueDay) || 10;
   const lateFeeAmount = (state.settings && state.settings.lateFeeAmount) || 0;
   let lateFeeApplied = 0;
@@ -521,10 +546,169 @@ function computeRecord(rec, tenant, monthKey){
     lateFeeApplied = lateFeeAmount;
   }
   const due = outstanding + lateFeeApplied;
-  return { reading, electricity, total, due, lateFeeApplied, isLate: lateFeeApplied>0 };
+  const credit = Math.max(0, -net); // amount tenant overpaid, if any
+  return { reading, electricity, total, due, net, credit, lateFeeApplied, isLate: lateFeeApplied>0 };
 }
 
+/* ---------- Expenses ---------- */
+const EXPENSE_CATEGORIES = ['Electricity','Sweeper','Painter','Repairs','Other'];
+
+function getExpenses(monthKey){
+  const month = ensureMonth(monthKey || state.activeMonth);
+  if(!month.expenses) month.expenses = [];
+  return month.expenses;
+}
+
+function totalExpenses(monthKey){
+  return getExpenses(monthKey).reduce((s,e)=> s + (Number(e.amount)||0), 0);
+}
+
+function addExpense(category, label, amount, note){
+  const list = getExpenses(state.activeMonth);
+  list.push({
+    id: uid(),
+    category: category || 'Other',
+    label: (label||'').trim(),
+    amount: Number(amount)||0,
+    note: (note||'').trim(),
+    date: new Date().toISOString()
+  });
+  saveState();
+}
+
+function deleteExpense(expenseId){
+  const month = ensureMonth(state.activeMonth);
+  const exp = (month.expenses||[]).find(e=>e.id===expenseId);
+  if(!exp) return;
+  showConfirm('Delete this expense — <b>' + (exp.label || exp.category) + ', ' + fmt(exp.amount) + '</b>?', ()=>{
+    month.expenses = month.expenses.filter(e=>e.id!==expenseId);
+    saveState();
+    render();
+    toast('Expense deleted');
+  });
+}
+
+
+
 function fmt(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+/* ---------- Excel Export ---------- */
+function monthSheetName(monthKey){
+  const [y,m] = monthKey.split('-').map(Number);
+  const abbr = ['JAN','FEB','MAR','APR','MAY','JUNE','JULY','AUG','SEP','OCT','NOV','DEC'];
+  return abbr[m-1] + ' ' + y + ' RENT';
+}
+
+function exportToExcel(){
+  const month = ensureMonth(state.activeMonth);
+  const tenants = sortByRoom(state.tenants.filter(t=>t.active));
+  const header = ['SNo.','Room Number','Name','Basic Rent\n(A)','Current Reading\n('+monthSheetName(state.activeMonth).split(' ').slice(0,2).join(' ')+')','Last Reading','Reading','Factor','Electricity Amount\n(B)','Sweeper\n(C)','Water         (D)','Balance (E)','Total Rent (A+B+C+D+E)','Rent Paid','Balance to Next Month'];
+  const rows = [header];
+  tenants.forEach((t,i)=>{
+    const rec = month.records[t.id] || {currentReading:0,lastReading:0,factor:8,sweeper:0,water:0,balancePrev:0,rentPaid:0};
+    const c = computeRecord(rec, t, state.activeMonth);
+    rows.push([
+      i+1, t.room, t.name, t.basicRent,
+      rec.currentReading, rec.lastReading, c.reading, rec.factor,
+      c.electricity, rec.sweeper, rec.water, rec.balancePrev,
+      c.total, rec.rentPaid, c.due
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:5},{wch:11},{wch:16},{wch:11},{wch:14},{wch:14},{wch:9},{wch:8},{wch:14},{wch:10},{wch:10},{wch:10},{wch:16},{wch:11},{wch:16}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, monthSheetName(state.activeMonth).slice(0,31));
+  XLSX.writeFile(wb, 'Kiraya_' + monthSheetName(state.activeMonth).replace(/ /g,'_') + '.xlsx');
+  toast('Excel file downloaded ✓');
+}
+
+/* ---------- Excel Import ---------- */
+function findCol(headerRow, keywords){
+  for(let i=0;i<headerRow.length;i++){
+    const cell = String(headerRow[i]||'').toLowerCase().replace(/\s+/g,' ').trim();
+    if(keywords.some(k=>cell.includes(k))) return i;
+  }
+  return -1;
+}
+
+function importFromExcel(file){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const sheetName = wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:''});
+
+      // find the header row (contains a cell that looks like "Room Number")
+      let headerIdx = -1;
+      for(let i=0;i<Math.min(rows.length,6);i++){
+        if(rows[i].some(c=>String(c||'').toLowerCase().includes('room'))){ headerIdx = i; break; }
+      }
+      if(headerIdx === -1) throw new Error('Room Number column not found');
+      const header = rows[headerIdx];
+
+      const colRoom = findCol(header, ['room number','room']);
+      const colName = findCol(header, ['name']);
+      const colBasic = findCol(header, ['basic rent']);
+      const colCurrent = findCol(header, ['current reading']);
+      const colLast = findCol(header, ['last reading']);
+      const colFactor = findCol(header, ['factor']);
+      const colSweeper = findCol(header, ['sweeper']);
+      const colWater = findCol(header, ['water']);
+      const colBalance = findCol(header, ['balance (e)','balance(e)']);
+      const colRentPaid = findCol(header, ['rent paid']);
+
+      if(colRoom === -1) throw new Error('Room Number column not found');
+
+      const month = ensureMonth(state.activeMonth);
+      let updated = 0, added = 0;
+
+      for(let i=headerIdx+1; i<rows.length; i++){
+        const row = rows[i];
+        if(!row || row.length===0) continue;
+        const roomVal = String(row[colRoom]||'').trim();
+        if(!roomVal) continue;
+
+        let tenant = state.tenants.find(t=>t.room.trim().toLowerCase() === roomVal.toLowerCase());
+        if(!tenant){
+          tenant = {
+            id: uid(), room: roomVal,
+            name: colName!==-1 ? String(row[colName]||'New Tenant').trim() : 'New Tenant',
+            phone:'', phone2:'',
+            basicRent: colBasic!==-1 ? Number(row[colBasic])||0 : 0,
+            active: true
+          };
+          state.tenants.push(tenant);
+          added++;
+        } else {
+          updated++;
+        }
+
+        const rec = month.records[tenant.id] || {currentReading:0,lastReading:0,factor:8,sweeper:0,water:0,balancePrev:0,rentPaid:0};
+        if(colCurrent!==-1 && row[colCurrent]!=='') rec.currentReading = Number(row[colCurrent])||0;
+        if(colLast!==-1 && row[colLast]!=='') rec.lastReading = Number(row[colLast])||0;
+        if(colFactor!==-1 && row[colFactor]!=='') rec.factor = Number(row[colFactor])||8;
+        if(colSweeper!==-1 && row[colSweeper]!=='') rec.sweeper = Number(row[colSweeper])||0;
+        if(colWater!==-1 && row[colWater]!=='') rec.water = Number(row[colWater])||0;
+        if(colBalance!==-1 && row[colBalance]!=='') rec.balancePrev = Number(row[colBalance])||0;
+        if(colRentPaid!==-1 && row[colRentPaid]!=='') rec.rentPaid = Number(row[colRentPaid])||0;
+        if(colBasic!==-1 && row[colBasic]!=='') tenant.basicRent = Number(row[colBasic])||tenant.basicRent;
+        if(colName!==-1 && row[colName]!=='') tenant.name = String(row[colName]).trim() || tenant.name;
+
+        month.records[tenant.id] = rec;
+      }
+
+      saveState();
+      render();
+      toast(`Imported: ${updated} updated, ${added} new ✓`);
+    }catch(err){
+      toast('Import failed: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
 
 function toast(msg){
   const el = document.getElementById('toast');
@@ -620,8 +804,10 @@ function refreshCard(tenantId){
   if(elecEl) elecEl.textContent = fmt(c.electricity);
   if(totalEl) totalEl.textContent = fmt(c.total);
   if(dueEl){
-    dueEl.textContent = c.due>0 ? fmt(c.due) : 'Paid in full';
+    dueEl.textContent = c.due>0 ? fmt(c.due) : (c.credit>0 ? fmt(c.credit)+' extra' : 'Paid in full');
     dueEl.className = 'tval ' + (c.due>0 ? 'due' : 'paid');
+    const dueLabelEl = dueEl.previousElementSibling;
+    if(dueLabelEl) dueLabelEl.textContent = c.due>0 ? 'Balance due' : (c.credit>0 ? 'Advance (credit)' : 'Status');
   }
   if(pillEl){
     pillEl.textContent = c.isLate ? 'Late' : (c.due>0 ? 'Due' : 'Paid');
@@ -669,6 +855,7 @@ function render(){
   if(state.ui.tab==='dashboard') root.appendChild(renderDashboard());
   else if(state.ui.tab==='collect') root.appendChild(renderCollect());
   else if(state.ui.tab==='tenants') root.appendChild(renderTenants());
+  else if(state.ui.tab==='expenses') root.appendChild(renderExpenses());
   else if(state.ui.tab==='message') root.appendChild(renderMessage());
 }
 
@@ -695,13 +882,19 @@ function renderDashboard(){
     due += c.due;
     if(c.due>0){ pendingCount++; pending.push({t, c}); }
   });
+  const expTotal = totalExpenses(state.activeMonth);
+  const net = collected - expTotal;
 
   wrap.innerHTML = `
     <div class="stat-grid">
-      <div class="stat-card paid"><div class="label">Collected</div><div class="value mono">${fmt(collected)}</div></div>
+      <div class="stat-card paid"><div class="label">Rent Received</div><div class="value mono">${fmt(collected)}</div></div>
       <div class="stat-card due"><div class="label">Due</div><div class="value mono">${fmt(due)}</div></div>
       <div class="stat-card"><div class="label">Tenants</div><div class="value mono">${active.length}</div></div>
       <div class="stat-card"><div class="label">Pending</div><div class="value mono">${pendingCount}</div></div>
+    </div>
+    <div class="stat-grid" style="margin-top:8px;">
+      <div class="stat-card"><div class="label">Total Expenses</div><div class="value mono">${fmt(expTotal)}</div></div>
+      <div class="stat-card ${net>=0?'paid':'due'}"><div class="label">Net (Received − Expenses)</div><div class="value mono">${fmt(net)}</div></div>
     </div>
     <div class="section-title">Pending payments <span class="count">${pendingCount} of ${active.length}</span></div>
   `;
@@ -772,11 +965,11 @@ function renderCollect(){
         <span>Basic: <b class="mono">${fmt(t.basicRent)}</b></span>
         <span>${rec.water>0 ? 'Electricity' : 'Electricity (+ Water)'}: <b class="mono" id="elec-${t.id}">${fmt(c.electricity + (rec.water>0?0:(rec.water||0)))}</b></span>
         ${rec.water>0 ? `<span>Water: <b class="mono">${fmt(rec.water)}</b></span>` : ''}
-        <span>Prev. balance: <b class="mono">${fmt(rec.balancePrev)}</b></span>
+        ${rec.balancePrev < 0 ? `<span style="color:var(--paid);">Advance credit (last month): <b class="mono">${fmt(-rec.balancePrev)}</b></span>` : `<span>Prev. balance: <b class="mono">${fmt(rec.balancePrev)}</b></span>`}
         ${c.lateFeeApplied>0 ? `<span style="color:var(--due);">Late charge (after ${state.settings.dueDay}th): <b class="mono">${fmt(c.lateFeeApplied)}</b></span>` : ''}
       </div>
       <div class="grid-inputs" style="margin-top:10px;">
-        <div class="field" style="grid-column:1/3;"><label>Rent Paid (₹)</label><input type="number" value="${rec.rentPaid||''}" placeholder="0" data-f="rentPaid" data-t="${t.id}"></div>
+        <div class="field" style="grid-column:1/3;"><label>Amount Received (₹)</label><input type="number" value="${rec.rentPaid||''}" placeholder="0" data-f="rentPaid" data-t="${t.id}"></div>
       </div>
       <div class="totals-row">
         <div>
@@ -784,8 +977,8 @@ function renderCollect(){
           <div class="mono" id="total-${t.id}" style="font-size:14px;">${fmt(c.total)}</div>
         </div>
         <div style="text-align:right;">
-          <div class="tlabel">${c.due>0?'Balance due':'Status'}</div>
-          <div class="tval ${c.due>0?'due':'paid'} mono" id="due-${t.id}">${c.due>0?fmt(c.due):'Paid in full'}</div>
+          <div class="tlabel">${c.due>0?'Balance due':(c.credit>0?'Advance (credit)':'Status')}</div>
+          <div class="tval ${c.due>0?'due':'paid'} mono" id="due-${t.id}">${c.due>0?fmt(c.due):(c.credit>0?fmt(c.credit)+' extra':'Paid in full')}</div>
         </div>
       </div>
       <div class="card-actions">
@@ -870,6 +1063,79 @@ function renderTenants(){
   return wrap;
 }
 
+function renderExpenses(){
+  const wrap = document.createElement('div');
+  const list = getExpenses(state.activeMonth);
+  const total = totalExpenses(state.activeMonth);
+
+  wrap.innerHTML = `
+    <div class="section-title">Expenses <span class="count">${monthLabel(state.activeMonth)}</span></div>
+    <div class="month-summary-bar"><span>${list.length} entr${list.length===1?'y':'ies'}</span><span>Total: <b class="mono">${fmt(total)}</b></span></div>
+  `;
+
+  const formBlock = document.createElement('div');
+  formBlock.className = 'msg-block';
+  formBlock.innerHTML = `
+    <h3>Add Expense</h3>
+    <div class="grid-inputs">
+      <div class="field">
+        <label>Category</label>
+        <select id="expCategory">
+          ${EXPENSE_CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Amount (₹)</label><input type="number" id="expAmount" placeholder="0"></div>
+      <div class="field" id="expLabelField" style="grid-column:1/3; display:none;"><label>Label (for Other)</label><input type="text" id="expLabel" placeholder="e.g. Plumber visit"></div>
+      <div class="field" style="grid-column:1/3;"><label>Note (optional)</label><input type="text" id="expNote" placeholder="e.g. paid to Ramesh via UPI"></div>
+    </div>
+    <button class="btn btn-ghost" id="addExpenseBtn" style="width:100%;margin-top:10px;">+ Add Expense</button>
+  `;
+  const catSel = formBlock.querySelector('#expCategory');
+  const labelField = formBlock.querySelector('#expLabelField');
+  catSel.addEventListener('change', ()=>{
+    labelField.style.display = catSel.value==='Other' ? 'block' : 'none';
+  });
+  formBlock.querySelector('#addExpenseBtn').onclick = ()=>{
+    const category = catSel.value;
+    const amountInp = formBlock.querySelector('#expAmount');
+    const amount = Number(amountInp.value||0);
+    if(amount<=0){ toast('Enter a valid amount'); return; }
+    const label = category==='Other' ? formBlock.querySelector('#expLabel').value : category;
+    const note = formBlock.querySelector('#expNote').value;
+    addExpense(category, label, amount, note);
+    render();
+    toast('Expense added ✓');
+  };
+  wrap.appendChild(formBlock);
+
+  if(list.length===0){
+    const e = document.createElement('div');
+    e.className='empty';
+    e.textContent = 'No expenses logged for ' + monthLabel(state.activeMonth) + ' yet.';
+    wrap.appendChild(e);
+  } else {
+    [...list].reverse().forEach(exp=>{
+      const row = document.createElement('div');
+      row.className = 'expense-row';
+      row.innerHTML = `
+        <div>
+          <span class="cat-badge">${exp.category}</span>
+          <div class="exp-label">${exp.label || exp.category}</div>
+          ${exp.note ? `<div class="exp-note">${exp.note}</div>` : ''}
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="exp-amt mono">${fmt(exp.amount)}</div>
+          <button class="remove-x" data-del="${exp.id}">✕</button>
+        </div>
+      `;
+      row.querySelector('[data-del]').onclick = ()=> deleteExpense(exp.id);
+      wrap.appendChild(row);
+    });
+  }
+
+  return wrap;
+}
+
 function renderMessage(){
   const wrap = document.createElement('div');
   const sample = state.tenants.find(t=>t.active) || state.tenants[0];
@@ -896,6 +1162,31 @@ function renderMessage(){
     render();
   });
   wrap.appendChild(settingsBlock);
+
+  const excelBlock = document.createElement('div');
+  excelBlock.className = 'msg-block';
+  excelBlock.innerHTML = `
+    <h3>Excel Backup &amp; Import</h3>
+    <p class="hint">Export the current month (${monthLabel(state.activeMonth)}) as an .xlsx file in your original ledger format, or import an .xlsx file to fill in readings and balances for this month.</p>
+    <div class="grid-inputs">
+      <button class="btn btn-wa" id="exportExcelBtn" type="button" style="width:100%;">⬇️ Export to Excel</button>
+      <label class="btn btn-wa" id="importExcelLabel" style="width:100%;text-align:center;display:flex;align-items:center;justify-content:center;background:var(--navy);">
+        ⬆️ Import from Excel
+        <input type="file" id="importExcelInput" accept=".xlsx,.xls" style="display:none;">
+      </label>
+    </div>
+  `;
+  excelBlock.querySelector('#exportExcelBtn').onclick = ()=> exportToExcel();
+  excelBlock.querySelector('#importExcelInput').addEventListener('change', (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(file){
+      showConfirm('Import <b>' + file.name + '</b>? This will fill in readings, balances and rent paid for <b>' + monthLabel(state.activeMonth) + '</b> from this file, matched by Room Number.', ()=>{
+        importFromExcel(file);
+      });
+    }
+    e.target.value = '';
+  });
+  wrap.appendChild(excelBlock);
 
   function block(kind, title, hint){
     const div = document.createElement('div');
